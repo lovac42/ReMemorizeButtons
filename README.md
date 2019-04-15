@@ -7,12 +7,10 @@ This is not a stand alone addon and requires ReMemorize for scheduling.
 Logging, Fuzz, and load balance are performed by ReMemorize
 
 
-
 <img src="https://github.com/lovac42/ReMemorizeButtons/blob/master/screenshots/screen.png?raw=true">
 
 
-no hotkey setup yet
+Only new cards, review cards are blocked to prevent abuse.
 
 
-on V1, 3 buttons are displayed as again, hard, good instead of A-G-E
-
+Please restart Anki if switching between V1 & V2, profile initialization values differ between them. In other words, don't screw around.
