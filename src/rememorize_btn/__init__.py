@@ -1,1 +1,1 @@
-from . import rememorize_btn
+from . import main

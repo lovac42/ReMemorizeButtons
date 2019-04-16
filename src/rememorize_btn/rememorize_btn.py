@@ -2,134 +2,112 @@
 # Copyright: (C) 2019 Lovac42
 # Support: https://github.com/lovac42/ReMemorizeButtons
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
-# Version: 0.0.2 (Prototype version)
 
 
-# This is not a stand alone addon and requires ReMemorize for scheduling.
-# Logging, Fuzz, and load balance are performed by ReMemorize
-# Only new cards, review cards are blocked to prevent abuse.
-
-# Please restart Anki if switching between V1 & V2,
-# profile initialization values differ between them.
-# In other words, don't screw around.
-
-
-# -----------------------------
-#  USER CONFIGS
-# -----------------------------
-
-# add-remove numbers/descriptions as needed
-BUTTON_DAYS = ( 10, 15, 20, 40 )
-BUTTON_DESC = ('Blah', 'Meh', 'Wowza', 'Wordless')
-
-DISALLOW_FILTERED_DECKS = True
-
-# -----------------------------
-
-
-import sys, aqt
 from aqt import mw
-from anki.hooks import wrap, runHook, addHook
-from aqt.reviewer import Reviewer
-from anki.sched import Scheduler
+from aqt.utils import tooltip, showInfo
+from anki.hooks import addHook
 from anki.lang import _
-from anki import version
-ANKI21 = version.startswith("2.1.")
-
-TAG='_answerButtonList' if ANKI21 else 'answerButtonList'
-
-
-#Global
-offMode=False
-nBtn=4
-
-def onProfileLoaded():
-    global nBtn
-    nBtn=4 if mw.col.sched.name=="std2" else 3
-addHook('profileLoaded', onProfileLoaded)
+from .config import *
+from .const import *
+from .utils import *
 
 
+class ReMemButtons:
+    btns=DEFAULT_BTN
+    remem_loaded=False
+    mode=True
+    count=4
 
-def answerButtons(sched, card, _old):
-    global offMode, nBtn
-    nBtn=_old(sched, card)
-    if card.type in (2,3) or \
-    (DISALLOW_FILTERED_DECKS and card.odid):
-        offMode=True
-        return nBtn
+    def __init__(self):
+        self.conf=Config(ADDON_NAME)
+        addHook("rememorize.configLoaded", self.onRememorizeLoaded)
 
-    for i in range (2,5): #who is calling?
+
+    def onRememorizeLoaded(self):
+        "signal that rememorize was installed"
+        self.remem_loaded=True
+
+
+    def getDays(self, ease):
+        e=ease-self.count-1
+        str=self.btns[e][1]
+        neg=False
+        if str=='0':
+            return '0'
+        if str[0]=='-': #negative num, change due, keep interval
+            neg=True
+            str=str[1:]
         try:
-            f=sys._getframe(i)
-        except ValueError: break
-        if f.f_code.co_name==TAG:
-            return nBtn
-
-    offMode=False
-    return nBtn+len(BUTTON_DAYS)
+            days=int(parseDate(str))
+            if neg: days = - days
+        except TypeError: return
+        except ValueError: return
+        return days
 
 
-
-def answerButtonList(rev, _old):
-    list=_old(rev)
-    if offMode:
-        return list
-    i=1;
-    for s in BUTTON_DESC:
-        list+=((nBtn+i, _(s)),)
-        i+=1
-    return list
+    def getKeys(self):
+        #key 1-4 already mapped
+        return range(5,5+len(self.btns))
 
 
-
-def buttonTime(rev, ease, _old):
-    if ease<=nBtn or offMode:
-        return _old(rev, ease)
-    days=BUTTON_DAYS[ease-nBtn-1]
-    return '<span class=nobold>%dd</span><br>'%days
+    def setCount(self, cnt):
+        self.mode=True
+        self.count=cnt
 
 
+    def check(self, card=None, ease=None):
+        "check if card or ease should be processed"
+        if not self.remem_loaded or not self.mode:
+            return False
 
-def answerCard(sched, card, ease, _old):
-    if ease<=nBtn or offMode:
-        return _old(sched, card, ease)
-    days=BUTTON_DAYS[ease-nBtn-1]
-    runHook('ReMemorize.reschedule', card, days)
+        if ease and ease<=self.count:
+            return False
 
-
-
-#For Anki20
-def keyHandler(rev, evt, _old):
-    key=unicode(evt.text())
-    n=nBtn+1
-    for i in range(n,n+len(BUTTON_DAYS)):
-        if key==str(i):
-            return rev._answerCard(int(key))
-    return _old(rev, evt)
+        if card:
+            if card.ivl > self.conf.get('young_card_ivl',0):
+                self.mode=False
+            elif card.odid and self.conf.get('disallow_filtered_decks',True):
+                self.mode=False
+        return self.mode
 
 
-#For Anki21
-def shortcutKeys(rev, _old):
-    arr=_old(rev)
-    n=nBtn+1
-    for i in range(n,n+len(BUTTON_DAYS)):
-        t=(str(i),lambda i=i: rev._answerCard(i))
-        arr.append(t)
-    return arr
+    def getExtraCount(self):
+        "return length of total btns"
+        self.btns=self.conf.get('buttons',DEFAULT_BTN)
+        return self.count+len(self.btns)
 
 
+    def reschedule(self, card, ease):
+        due=card.due
+        days=self.getDays(ease)
+        if days==None:
+            showInfo("Invalid parse string or past due")
+            return
+        elif days=='0':
+            runHook('ReMemorize.forget', card)
+        elif days>0:
+            runHook('ReMemorize.reschedule', card, days)
+        elif days<0:
+            runHook('ReMemorize.changeDue', card, -days)
+        else:
+            return
 
-Reviewer._answerButtonList = wrap(Reviewer._answerButtonList, answerButtonList, 'around')
-Reviewer._buttonTime = wrap(Reviewer._buttonTime, buttonTime, 'around')
-Scheduler.answerCard = wrap(Scheduler.answerCard, answerCard, 'around')
-Scheduler.answerButtons = wrap(Scheduler.answerButtons, answerButtons, 'around')
+        if self.conf.get('show_tooltip',True):
+            mw.progress.timer(20,
+                lambda:self.schedCheck(card.id,card.ivl,due),False)
 
 
-if ANKI21:
-    from anki.schedv2 import Scheduler as SchedulerV2
-    SchedulerV2.answerCard = wrap(SchedulerV2.answerCard, answerCard, 'around')
-    SchedulerV2.answerButtons = wrap(SchedulerV2.answerButtons, answerButtons, 'around')
-    Reviewer._shortcutKeys = wrap(Reviewer._shortcutKeys, shortcutKeys, 'around')
-else:
-    Reviewer._keyHandler = wrap(Reviewer._keyHandler, keyHandler, 'around')
+    def schedCheck(self, id, ivl, due):
+        msg=None
+        card=mw.col.getCard(id)
+        if card.ivl==0:
+            msg="Forgotten card"
+        elif card.ivl!=ivl:
+            msg="Reschedule %d days"%card.ivl
+        elif card.due!=due:
+            msg="Due Changed"
+        if msg:
+            tooltip(_(msg), period=1000)
+
 
