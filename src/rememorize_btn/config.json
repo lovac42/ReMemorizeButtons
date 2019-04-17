@@ -2,5 +2,7 @@
     "buttons": [["Blah","10"],["Meh","15"],["Wowza","20"],["Wordless","40"]],
     "young_card_ivl": 0,
     "show_tooltip": true,
-    "disallow_filtered_decks": true
+    "button_text_prefix": "R:",
+    "disallow_filtered_decks": true,
+    "show_btn_time_in_days": false
 }

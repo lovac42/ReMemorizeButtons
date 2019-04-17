@@ -29,6 +29,17 @@ class ReMemButtons:
         self.remem_loaded=True
 
 
+    def getButtonTime(self, ease):
+        e=ease-self.count #start from 1
+        p=self.conf.get("button_text_prefix","R:")
+        if self.conf.get("show_btn_time_in_days",False):
+            s=self.getDays(ease) or "errore"
+            s+='d'
+        else:
+            s=self.btns[e-1][1] #zero based
+        return '<span class="nobold rem_time%d">%s%s</span><br>'%(e,p,s)
+
+
     def getDays(self, ease):
         e=ease-self.count-1
         str=self.btns[e][1]

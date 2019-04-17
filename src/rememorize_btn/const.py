@@ -8,7 +8,7 @@
 from anki import version
 ANKI21 = version.startswith("2.1.")
 
-ANS_BTN_TAG='_answerButtonList' if ANKI21 else 'answerButtonList'
+BTN_CNT_BYPASS=('_defaultEase','_answerButtonList')
 
 ADDON_NAME='rememorize_btn'
 
