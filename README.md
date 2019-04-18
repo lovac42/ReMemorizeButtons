@@ -10,13 +10,17 @@ You can create as many custom buttons as you need.
 Values include: positive or negative intervals, positive or negative dates, and zero. No p prefix.  
 
 
+## Permissions:
+Read Only.  
+Standard Read/Write access to config.json file.  
+
+
 ## Hotkeys:
 On V1, depending on the card, there may be 4, 3 or even 2 buttons. The good button maybe mapped to 2 or 3 and the easy button mapped to 3 or 4. The shortcuts in this addon is coded to start at the 5th button regardless of how many buttons there may be. You will get a friendly warning if you press button 4 when there is only 3 buttons.
 
 
-## Permissions:
-Read Only.  
-Standard Read/Write access to config.json file.
+## Conflicts:
+This addon will not work with "more answer buttons for new cards". Specifically, that addon will not play well with other button tweek addons. The current and past versions are hardcoded and capped at 3-4 buttons max.
 
 
 ## Colors:
