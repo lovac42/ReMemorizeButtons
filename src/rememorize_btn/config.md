@@ -25,6 +25,12 @@ Don't show buttons in filter decks (custom study).
 true or false  
 Shows a friendly message after reschedule.  
 
+## show_answer_confirmation:
+Show tooltip for which button as pressed.
+
+## cascade_easy_button:
+If the 3rd or 4th button is missing, the next lower button number will be used.
+
 ## show_btn_time_in_days:
 Decodes 1/25/2019 into days and display them as "25d" in button's next due.
 

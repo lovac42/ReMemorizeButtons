@@ -122,7 +122,10 @@ comes back around. NO CHANGES HAS BEEN MADE.
             if self.conf.get('cascade_easy_button',False):
                 c=mw.reviewer.card
                 mw.col.sched.answerCard(c,self.count)
-                self.showAnsConfirm(self.count)
+                if self.conf.get('show_tooltip',True):
+                    msg="Key %d was cascaded to %d"%(ease,self.count)
+                    d=self.conf.get('tooltip_duration',1200)
+                    tooltipHint(msg,d/1.5)
             else:
                 showInfo("""
 Key %d on V1 is not used here, Mr.Reviewer will<br>
@@ -155,5 +158,5 @@ Set "cascade_easy_button" to true in config to avoid this message.
             k=BTN_KEY[self.count-2][ease-1]-1
             msg="%s!"%("Again","Hard","Good","Easy")[k]
             d=self.conf.get('tooltip_duration',1200)
-            tooltipHint(msg,d)
+            tooltipHint(msg,d/1.5)
 
