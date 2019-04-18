@@ -3,10 +3,12 @@
 ## About:
 <b>Note:</b> This is not a stand alone addon and requires ReMemorize for scheduling.
 
-This a a graphical front end that sends a signal to ReMemorize and reschedules the current card in the reviewer. Logging, Fuzz, and load balance are performed by ReMemorize.  
+This is a graphical front end that sends a signal to ReMemorize and reschedules the current card in the reviewer. Logging, Fuzz, and load balance are performed by ReMemorize.  
 
 The extra buttons are logged as reschedules, as oppose to regular reviews, they are not intended for abuse.  
+
 You can create as many custom buttons as you need.  
+
 Values include: positive or negative intervals, positive or negative dates, and zero. No p prefix.  
 
 
@@ -27,17 +29,8 @@ This addon will not work with "more answer buttons for new cards". Specifically,
 Color can be added with this addon: https://ankiweb.net/shared/info/1829090218  
 The stylesheet will need to be tweeked a bit as follows:  
 ```
-/* the "Easy" button */
-button[onclick*="ease3"]:not(#defease),
-button[onclick*="ease4"]:not(#defease) {
-    background-color: #03A9F4;
-}
-
 /* colorize ReMemorize buttons */
-
-.rem_time1 ~ button[onclick*="ease3"],
-.rem_time1 ~ button[onclick*="ease4"],
-.rem_time1 ~ button[onclick*="ease5"] {
+.rem_time1 ~ button {
     background-color: lightgray !important;
 }
 .rem_time2 ~ button {
@@ -57,7 +50,7 @@ button[onclick*="ease4"]:not(#defease) {
 }
 ```
 
-CSS classes:
+CSS classes:  
 <b>rem_error</b> - used to warn of string parsing errors. When it cannot convert string into days or when it is already past due.  
 <b>rem_timeN</b> - N is the number of the extra button, 12345...  
 
