@@ -29,14 +29,14 @@ def wrap_answerButtons(sched, card, _old):
     if not rBtn.check(card):
         return cnt
 
-    extraBtn=rBtn.getExtraCount() #initialize ex cnt
+    # Used to get around V1's dynamic 3-4 buttons.
     for i in range (2,5): #who is calling?
         try:
             f=sys._getframe(i)
         except ValueError: break
         if f.f_code.co_name in BTN_CNT_BYPASS:
             return cnt
-    return extraBtn
+    return rBtn.getExtraCount()
 
 
 def wrap_answerButtonList(rev, _old):

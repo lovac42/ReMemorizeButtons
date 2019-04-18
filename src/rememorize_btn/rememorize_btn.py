@@ -5,9 +5,9 @@
 
 
 from aqt import mw
-from aqt.utils import tooltip, showInfo
+from aqt.utils import showInfo
 from anki.hooks import addHook
-from anki.lang import _
+# from anki.lang import _
 from .config import *
 from .const import *
 from .utils import *
@@ -21,7 +21,13 @@ class ReMemButtons:
 
     def __init__(self):
         self.conf=Config(ADDON_NAME)
+        addHook(ADDON_NAME+".configLoaded", self.onConfigLoaded)
+        addHook(ADDON_NAME+".configUpdated", self.onConfigLoaded)
         addHook("rememorize.configLoaded", self.onRememorizeLoaded)
+
+
+    def onConfigLoaded(self):
+        self.btns=self.conf.get('buttons',DEFAULT_BTN)
 
 
     def onRememorizeLoaded(self):
@@ -31,10 +37,13 @@ class ReMemButtons:
 
     def getButtonTime(self, ease):
         e=ease-self.count #start from 1
-        p=self.conf.get("button_text_prefix","R:")
+        p=self.conf.get("button_text_prefix","R: ")
         if self.conf.get("show_btn_time_in_days",False):
-            s=self.getDays(ease) or "errore"
-            s+='d'
+            d=self.getDays(ease)
+            if not d:
+                #tobe colorize red with css
+                return '<span class="nobold rem_error">ERROR!</span><br>'
+            s='%dd'%d
         else:
             s=self.btns[e-1][1] #zero based
         return '<span class="nobold rem_time%d">%s%s</span><br>'%(e,p,s)
@@ -44,11 +53,13 @@ class ReMemButtons:
         e=ease-self.count-1
         str=self.btns[e][1]
         neg=False
-        if str=='0':
-            return '0'
-        if str[0]=='-': #negative num, change due, keep interval
+        if str=='-0':
+            return str
+        elif str[0]=='-': #negative num, change due, keep interval
             neg=True
             str=str[1:]
+        elif str=='0':
+            return '0' #str to bypass checks for null
         try:
             days=int(parseDate(str))
             if neg: days = - days
@@ -58,8 +69,10 @@ class ReMemButtons:
 
 
     def getKeys(self):
-        #key 1-4 already mapped
-        return range(5,5+len(self.btns))
+        c=len(self.btns)+self.count
+        if c<5: #key 1-4 already mapped
+            return (None,)
+        return range(5,c+1)
 
 
     def setCount(self, cnt):
@@ -85,7 +98,6 @@ class ReMemButtons:
 
     def getExtraCount(self):
         "return length of total btns"
-        self.btns=self.conf.get('buttons',DEFAULT_BTN)
         return self.count+len(self.btns)
 
 
@@ -93,7 +105,15 @@ class ReMemButtons:
         due=card.due
         days=self.getDays(ease)
         if days==None:
-            showInfo("Invalid parse string or past due")
+            showInfo("""
+Past due or invalid parsing string,<br>
+The reviewer will drop this card,<br>
+but you will see it again when it<br>
+comes back around. NO CHANGES HAS BEEN MADE.
+""")
+            return
+        elif days=='-0':
+            showInfo("PC LOAD A4!")
             return
         elif days=='0':
             runHook('ReMemorize.forget', card)
@@ -105,20 +125,8 @@ class ReMemButtons:
             return
 
         if self.conf.get('show_tooltip',True):
+            d=self.conf.get('tooltip_duration',1200)
+            d=max(d,400) #idiot proof enough?
             mw.progress.timer(20,
-                lambda:self.schedCheck(card.id,card.ivl,due),False)
-
-
-    def schedCheck(self, id, ivl, due):
-        msg=None
-        card=mw.col.getCard(id)
-        if card.ivl==0:
-            msg="Forgotten card"
-        elif card.ivl!=ivl:
-            msg="Reschedule %d days"%card.ivl
-        elif card.due!=due:
-            msg="Due Changed"
-        if msg:
-            tooltip(_(msg), period=1000)
-
+                lambda:schedConfirm(card.id,card.ivl,due,d),False)
 
