@@ -43,9 +43,9 @@ def wrap_answerButtonList(rev, _old):
     list=_old(rev)
     if not rBtn.check():
         return list
-    i=1;
+    i=rBtn.getCount()+1
     for s,t in rBtn.btns:
-        list+=((rBtn.count+i, _(s)),)
+        list+=((i, _(s)),)
         i+=1
     return list
 
@@ -70,7 +70,7 @@ def wrap_keyHandler(rev, evt, _old): #called 1st
     key=unicode(evt.text())
     for i in rBtn.getKeys():
         if key==str(i):
-            return rev._answerCard(int(key))
+            return rev._answerCard(i)
     return _old(rev, evt)
 
 

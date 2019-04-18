@@ -36,7 +36,7 @@ class ReMemButtons:
 
 
     def getButtonTime(self, ease):
-        e=ease-self.count #start from 1
+        if ease<5: return ''
         p=self.conf.get("button_text_prefix","R: ")
         if self.conf.get("show_btn_time_in_days",False):
             d=self.getDays(ease)
@@ -45,13 +45,13 @@ class ReMemButtons:
                 return '<span class="nobold rem_error">ERROR!</span><br>'
             s='%dd'%d
         else:
-            s=self.btns[e-1][1] #zero based
-        return '<span class="nobold rem_time%d">%s%s</span><br>'%(e,p,s)
+            s=self.btns[ease-5][1] #zero based
+        return '<span class="nobold rem_time%d">%s%s</span><br>'%(ease-4,p,s)
 
 
     def getDays(self, ease):
-        e=ease-self.count-1
-        str=self.btns[e][1]
+        if ease<5: return 'x' #avoid V1 dynamic btn mappings
+        str=self.btns[ease-5][1]
         neg=False
         if str=='-0':
             return str
@@ -69,11 +69,14 @@ class ReMemButtons:
 
 
     def getKeys(self):
-        c=len(self.btns)+self.count
-        if c<5: #key 1-4 already mapped
+        L=len(self.btns)
+        if not L:
             return (None,)
-        return range(5,c+1)
+        return range(5,6+L)
 
+
+    def getCount(self):
+        return max(4,self.count)
 
     def setCount(self, cnt):
         self.mode=True
@@ -98,7 +101,7 @@ class ReMemButtons:
 
     def getExtraCount(self):
         "return length of total btns"
-        return self.count+len(self.btns)
+        return self.getCount()+len(self.btns)
 
 
     def reschedule(self, card, ease):
@@ -114,6 +117,13 @@ comes back around. NO CHANGES HAS BEEN MADE.
             return
         elif days=='-0':
             showInfo("PC LOAD A4!")
+            return
+        elif days=='x': #V1 dyn good, ez btn
+            showInfo("""
+Key 4 or 3 on V1 is not used here, Mr.Reviewer will<br>
+drop the current card. But you will see it again when<br>
+it comes back around. NO CHANGES HAS BEEN MADE.
+""")
             return
         elif days=='0':
             runHook('ReMemorize.forget', card)
