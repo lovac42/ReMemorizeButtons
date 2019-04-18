@@ -1,6 +1,6 @@
 # ReMemorize Buttons
-This is not a stand alone addon and requires ReMemorize for scheduling.
-
+This is not a stand alone addon and requires ReMemorize for scheduling.  
+Make sure to check the settings for ReMemorize such as sibling forget, sibling reschedule, and fuzz_days.  
 
 ## buttons:
 Add or remove numbers as needed, one number for each extra button will be created.  
@@ -30,8 +30,10 @@ Decodes 1/25/2019 into days and display them as "25d" in button's next due.
 
 ## button_text_prefix
 Friendly reminder text, but you should really use CSS to style and colorize these buttons. Look for a good addon that css styling.  
-CSS class: <b>rem_timeN</b>, where N is the number of the extra button, 12345...  
+CSS class: <i>rem_error</i> or <b>rem_timeN</b>, where N is the number of the extra button, 12345...  
 e.g.  
 rem_time1 {color:red;}  
 rem_time1 ~ button{background-color:green;}  
+rem_error {color:red;}  
+rem_error ~ button{background-color:red;}  
 

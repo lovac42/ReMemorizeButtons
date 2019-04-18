@@ -3,12 +3,32 @@
 # Support: https://github.com/lovac42/ReMemorizeButtons
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
-# Code from ReMemorize.utils.py and modified
+# Some code from ReMemorize.utils.py and modified
 
 
 from aqt import mw
-# from aqt.utils import tooltip, showInfo
+from aqt.qt import *
+from aqt.utils import tooltip, showInfo
+from anki.lang import _
 import datetime
+import aqt.utils
+
+
+def schedConfirm(id, ivl, due, duration):
+    msg=None
+    card=mw.col.getCard(id)
+    if card.ivl==0:
+        msg="Forgotten card"
+    elif card.ivl!=ivl:
+        msg="Reschedule %d days"%card.ivl
+    elif card.due!=due:
+        msg="Card due date changed"
+    if msg:
+        tooltip(_(msg), period=duration)
+        aw=mw.app.activeWindow() or mw
+        aqt.utils._tooltipLabel.move(
+            aw.mapToGlobal(QPoint( aw.width()/2 -100, aw.height() -200)))
+            #wish we could track eye movement and reposition accordingly :/
 
 
 def parseDate(days):
