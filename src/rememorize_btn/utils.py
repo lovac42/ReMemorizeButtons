@@ -24,11 +24,15 @@ def schedConfirm(id, ivl, due, duration):
     elif card.due!=due:
         msg="Card due date changed"
     if msg:
-        tooltip(_(msg), period=duration)
-        aw=mw.app.activeWindow() or mw
-        aqt.utils._tooltipLabel.move(
-            aw.mapToGlobal(QPoint( aw.width()/2 -100, aw.height() -200)))
-            #wish we could track eye movement and reposition accordingly :/
+        tooltipHint(msg, duration)
+
+
+def tooltipHint(msg, period):
+    tooltip(_(msg), period=period)
+    aw=mw.app.activeWindow() or mw
+    aqt.utils._tooltipLabel.move(
+        aw.mapToGlobal(QPoint( aw.width()/2 -100, aw.height() -200)))
+        #wish we could track eye movement and reposition accordingly :/
 
 
 def parseDate(days):

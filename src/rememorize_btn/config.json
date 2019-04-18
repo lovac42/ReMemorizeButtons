@@ -3,6 +3,8 @@
     "young_card_ivl": 0,
     "tooltip_duration": 1200,
     "show_tooltip": true,
+    "show_answer_confirmation": false,
+    "cascade_easy_button": false,
     "button_text_prefix": "R: ",
     "disallow_filtered_decks": true,
     "show_btn_time_in_days": false

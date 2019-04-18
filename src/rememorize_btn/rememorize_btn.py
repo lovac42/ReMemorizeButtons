@@ -119,11 +119,17 @@ comes back around. NO CHANGES HAS BEEN MADE.
             showInfo("PC LOAD A4!")
             return
         elif days=='x': #V1 dyn good, ez btn
-            showInfo("""
-Key 4 or 3 on V1 is not used here, Mr.Reviewer will<br>
+            if self.conf.get('cascade_easy_button',False):
+                c=mw.reviewer.card
+                mw.col.sched.answerCard(c,self.count)
+                self.showAnsConfirm(self.count)
+            else:
+                showInfo("""
+Key %d on V1 is not used here, Mr.Reviewer will<br>
 drop the current card. But you will see it again when<br>
-it comes back around. NO CHANGES HAS BEEN MADE.
-""")
+it comes back around. NO CHANGES HAS BEEN MADE.<br>
+Set "cascade_easy_button" to true in config to avoid this message.
+"""%ease)
             return
         elif days=='0':
             runHook('ReMemorize.forget', card)
@@ -139,4 +145,15 @@ it comes back around. NO CHANGES HAS BEEN MADE.
             d=max(d,400) #idiot proof enough?
             mw.progress.timer(20,
                 lambda:schedConfirm(card.id,card.ivl,due,d),False)
+
+
+    def showAnsConfirm(self, ease):
+        if self.conf.get('show_answer_confirmation',False):
+            BTN_KEY=((1,3,3,3),
+                     (1,3,4,4),
+                     (1,2,3,4))
+            k=BTN_KEY[self.count-2][ease-1]-1
+            msg="%s!"%("Again","Hard","Good","Easy")[k]
+            d=self.conf.get('tooltip_duration',1200)
+            tooltipHint(msg,d)
 

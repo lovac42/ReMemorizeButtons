@@ -58,7 +58,9 @@ def wrap_buttonTime(rev, ease, _old):
 
 def wrap_answerCard(sched, card, ease, _old):
     if not rBtn.check(ease=ease):
-        return _old(sched, card, ease)
+        ret=_old(sched, card, ease)
+        rBtn.showAnsConfirm(ease)
+        return ret
     try:
         rBtn.reschedule(card,ease)
     except TypeError: pass
