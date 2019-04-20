@@ -13,3 +13,13 @@ BTN_CNT_BYPASS=('_defaultEase','_answerButtonList')
 ADDON_NAME='rememorize_btn'
 
 DEFAULT_BTN=(('ReM',25),)
+
+
+REMEMORIZE_BTN=0
+MODIFIER_BTN=1
+
+
+ANS_KEY_MATRIX=((1,3,3,3),
+                (1,3,4,4),
+                (1,2,3,4))
+

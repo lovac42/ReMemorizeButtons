@@ -14,7 +14,7 @@ import datetime
 import aqt.utils
 
 
-def schedConfirm(id, ivl, due, duration):
+def schedConfirm(id, ivl, due, duration, txt=''):
     msg=None
     card=mw.col.getCard(id)
     if card.ivl==0:
@@ -24,7 +24,7 @@ def schedConfirm(id, ivl, due, duration):
     elif card.due!=due:
         msg="Card due date changed"
     if msg:
-        tooltipHint(msg, duration)
+        tooltipHint(txt+'<br>'+msg, duration)
 
 
 def tooltipHint(msg, period):

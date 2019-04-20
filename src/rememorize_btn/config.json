@@ -1,11 +1,17 @@
 {
-    "buttons": [["Bump","40"],["Cake","200"]],
-    "young_card_ivl": 0,
+    "rememorize_buttons": [["Postpone","-30"]],
+    "rev_modifier_buttons": [["Bump","150"],["Cake","200"]],
+    "new_modifier_buttons": [["2X","200"],["3X","300"]],
+    "lrn_modifier_buttons": [["Bump","150"],["Cake","200"]],
+    "button_text_prefix": "R: ",
+    "enable_write_access": true,
+    "keep_ease_factor": false,
+    "hard_grade_threshold": 60,
     "tooltip_duration": 1200,
     "show_tooltip": true,
     "show_answer_confirmation": false,
     "cascade_easy_button": false,
-    "button_text_prefix": "R: ",
     "disallow_filtered_decks": true,
-    "show_btn_time_in_days": false
+    "show_btn_time_in_days": false,
+    "young_card_ivl": 99999999
 }
