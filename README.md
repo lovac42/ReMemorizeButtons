@@ -54,8 +54,8 @@ The stylesheet will need to be tweeked a bit as follows:
 CSS classes:  
 <b>rem_error</b> - used to warn of string parsing errors. When it cannot convert string into days or when it is already past due.  
 <b>rem_timeN</b> - N is the number of the extra button, 12345...  
-<b>reschedule</b> - ReMemorize buttons.  
-<b>ease_bonus</b> - custom easy buttons.  
+<b>rem_reschedule</b> - ReMemorize buttons.  
+<b>rem_modifier</b> - custom modifier buttons.  
 
 
 
@@ -63,6 +63,8 @@ CSS classes:
 <img src="https://github.com/lovac42/ReMemorizeButtons/blob/master/screenshots/screen2.png?raw=true">  
 
 <img src="https://github.com/lovac42/ReMemorizeButtons/blob/master/screenshots/screen.png?raw=true">  
+
+<img src="https://github.com/lovac42/ReMemorizeButtons/blob/master/screenshots/donts.png?raw=true">  
 
 <img src="https://github.com/lovac42/ReMemorizeButtons/blob/master/screenshots/logs.png?raw=true">  
 

@@ -72,9 +72,6 @@ class AltScheduler:
 
     def reschedule(self, card, ease, modifier):
         assert self.conf.get('enable_write_access',False)
-
-        self.meta_card.setFactor(card.factor)
-
         self.setModifier(modifier)
         self.answerCard(card,ease)
         self.reset()
@@ -94,5 +91,5 @@ class AltScheduler:
             ease=self.remapBtnGrade(card,nxIvl)
 
         self.meta_card.setIvl(nxIvl)
+        self.meta_card.setFactor(card.factor)
         mw.col.sched.answerCard(card,ease)
-

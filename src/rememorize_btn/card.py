@@ -23,10 +23,7 @@ class MetaCard:
         self.factor=fct
 
     def getFactor(self, fct):
-        if self.conf.get('enable_write_access',False) and \
-        self.conf.get('keep_ease_factor',False):
-            return self.factor or fct
-        return fct
+        return self.factor or fct
 
 
 

@@ -1,8 +1,8 @@
 {
     "rememorize_buttons": [["Postpone","-30"]],
     "rev_modifier_buttons": [["Bump","150"],["Cake","200"]],
-    "new_modifier_buttons": [["2X","200"],["3X","300"]],
-    "lrn_modifier_buttons": [["Bump","150"],["Cake","200"]],
+    "new_modifier_buttons": [["New2X","200"],["New3X","300"]],
+    "lrn_modifier_buttons": [["Lrn2X","200"],["Lrn4X","400"]],
     "button_text_prefix": "R: ",
     "enable_write_access": true,
     "keep_ease_factor": false,

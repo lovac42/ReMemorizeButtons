@@ -89,7 +89,7 @@ class ReMemButtons:
             ivl=self.alt_sched.getBtnIvl(card,self.count)
             s=fmtTimeSpan(ivl*86400,short=True)
 
-        return '<span class="nobold ease_bonus rem_time%d">%s</span><br>'%(ease-4,s)
+        return '<span class="nobold rem_modifier rem_time%d">%s</span><br>'%(ease-4,s)
 
 
     def getKeys(self):

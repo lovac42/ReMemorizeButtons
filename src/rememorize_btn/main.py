@@ -4,10 +4,6 @@
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 
-# This is not a stand alone addon and requires ReMemorize for scheduling.
-# Logging, Fuzz, and load balance are performed by ReMemorize
-
-
 import sys
 from aqt import mw
 from anki.hooks import wrap
@@ -71,16 +67,25 @@ def wrap_answerCard(sched, card, ease, _old):
 
 def wrap_constrainedIvl(sched, ivl, conf, prev, fuzz=False, _old=None):
     nx=rBtn.alt_sched.hasSavedIvl()
-    if nx: return nx
-    if mw.col.sched.name=="std":
+    if nx:
+        return nx
+    if sched.name=="std":
         return _old(sched, ivl, conf, prev)
     return _old(sched, ivl, conf, prev, fuzz)
 
 
 
+def wrap_rescheduleLapse(sched, card, _old):
+    "Ensures proper EF logging for fail btn"
+    delay=_old(sched,card)
+    if rBtn.alt_sched.isReschedulable(card):
+        card.factor=rBtn.alt_sched.meta_card.getFactor(card.factor)
+    return delay
+
+
 def wrap_rescheduleRev(sched, card, ease, early=False, _old=None):
-    "If user config set to keep original factor, ensures proper logging"
-    if mw.col.sched.name=="std":
+    "Ensures proper EF logging for pass btns"
+    if sched.name=="std":
         ret=_old(sched, card, ease) #using _old ensures load order
     else:
         ret=_old(sched, card, ease, early)
@@ -90,7 +95,8 @@ def wrap_rescheduleRev(sched, card, ease, early=False, _old=None):
 
 
 def wrap_rescheduleNew(sched, card, conf, early, _old):
-    ret=_old(sched, card, conf, early) #initialize new cards, then add modifier
+    "initialize new cards, then add modifier"
+    ret=_old(sched, card, conf, early)
     mod=rBtn.alt_sched.getModifier()
     if mod: #Reschedulable by default
         card.ivl=max(1,int(card.ivl*mod))
@@ -104,7 +110,7 @@ def wrap_rescheduleAsRev(sched, card, conf, early, _old):
     if nx and rBtn.alt_sched.isReschedulable(card):
         if card.type in (2,3): #rev only
             card.ivl=nx
-            if mw.col.sched.name=="std":
+            if sched.name=="std":
                 card.odue=sched.today+nx #odue will be set to due on _old
             else:
                 card.due=sched.today+nx
@@ -156,6 +162,7 @@ Scheduler._rescheduleNew = wrap(Scheduler._rescheduleNew, wrap_rescheduleNew, 'a
 Scheduler._rescheduleRev = wrap(Scheduler._rescheduleRev, wrap_rescheduleRev, 'around')
 Scheduler._nextLapseIvl = wrap(Scheduler._nextLapseIvl, wrap_nextLapseIvl, 'around')
 Scheduler._rescheduleAsRev = wrap(Scheduler._rescheduleAsRev, wrap_rescheduleAsRev, 'around')
+Scheduler._rescheduleLapse = wrap(Scheduler._rescheduleLapse, wrap_rescheduleLapse, 'around')
 
 if ANKI21:
     from anki.schedv2 import Scheduler as SchedulerV2
@@ -166,6 +173,7 @@ if ANKI21:
     SchedulerV2._rescheduleRev = wrap(SchedulerV2._rescheduleRev, wrap_rescheduleRev, 'around')
     SchedulerV2._lapseIvl = wrap(SchedulerV2._lapseIvl, wrap_nextLapseIvl, 'around')
     SchedulerV2._rescheduleAsRev = wrap(SchedulerV2._rescheduleAsRev, wrap_rescheduleAsRev, 'around')
+    SchedulerV2._rescheduleLapse = wrap(SchedulerV2._rescheduleLapse, wrap_rescheduleLapse, 'around')
 
     Reviewer._shortcutKeys = wrap(Reviewer._shortcutKeys, wrap_shortcutKeys, 'around')
 else:

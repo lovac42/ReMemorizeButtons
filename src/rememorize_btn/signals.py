@@ -58,7 +58,7 @@ class ReMemorizeScheduler:
             s=self.btns[ease-5][1] #zero based
 
         p=self.conf.get("button_text_prefix","R: ")
-        return '<span class="nobold reschedule rem_time%d">%s%s</span><br>'%(ease-4,p,s)
+        return '<span class="nobold rem_reschedule rem_time%d">%s%s</span><br>'%(ease-4,p,s)
 
 
     def _parseDays(self, ease):
