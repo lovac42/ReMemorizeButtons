@@ -36,11 +36,14 @@ class ReMemButtons:
         self.rememorize=ReMemorizeScheduler(self.conf)
 
 
-    def setButtons(self, card):
+    def reset(self, n=4):
+        self.mode=True
         self.btns=[]
+        self.setCount(n)
 
-        if self.conf.get('enable_write_access',False) and \
-        self.alt_sched.isReschedulable(card):
+
+    def setButtons(self, card):
+        if self.alt_sched.isReschedulable(card):
             if card.type in (0,1):
                 key='new_modifier_buttons'
             elif card.queue in (1,3):
@@ -51,7 +54,7 @@ class ReMemButtons:
             self.write_btns=len(w)
             self.btns.extend(w)
 
-        if self.rememorize:
+        if self.rememorize and self.alt_sched.isDynReschedulable(card):
             r=self.conf.get('rememorize_buttons',DEFAULT_BTN)
             self.btns.extend(r)
 
@@ -100,13 +103,10 @@ class ReMemButtons:
 
 
     def setCount(self, cnt):
-        self.mode=True
         self.count=cnt
-
 
     def getCount(self):
         return max(4,self.count)
-
 
     def getExtraCount(self):
         "return length of total btns"

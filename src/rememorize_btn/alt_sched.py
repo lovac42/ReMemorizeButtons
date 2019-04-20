@@ -63,11 +63,15 @@ class AltScheduler:
     def isReschedulable(self, card):
         if not self.conf.get('enable_write_access',False):
             return False
+        return self.isDynReschedulable(card)
 
-        #check V1 V2 filter reschedule
-        if mw.col.sched.name=="std":
-            return mw.col.sched._resched(card)
-        return True
+
+    def isDynReschedulable(self, card):
+        "check V1 V2 filter reschedule"
+        dconf=mw.col.sched._cardConf(card)
+        if not dconf['dyn']:
+            return True
+        return dconf['resched']
 
 
     def reschedule(self, card, ease, modifier):

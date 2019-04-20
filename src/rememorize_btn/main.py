@@ -22,7 +22,7 @@ rBtn=ReMemButtons()
 def wrap_answerButtons(sched, card, _old):
     cnt=_old(sched, card)
 
-    rBtn.setCount(cnt)
+    rBtn.reset(cnt)
     rBtn.setButtons(card)
     if not rBtn.check(card):
         return cnt

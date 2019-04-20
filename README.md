@@ -4,7 +4,7 @@
 <b>Note:</b> In read only mode, this addon requires ReMemorize for scheduling.
 
 ### ReMemorize Buttons:
-In read only mode, this addon sends a signal to ReMemorize and reschedules the current card in the reviewer. Logging, Fuzz, and load balance are performed by ReMemorize. The ReMemorize buttons are logged as reschedules, not as regular reviews, they are not intended for abuse. Use the modifier buttons if you need these logged as regular reviews.
+In read only mode, this addon sends a signal to ReMemorize and reschedules the current card in the reviewer. Logging, Fuzz, and load balance are performed by ReMemorize. The ReMemorize buttons are logged as reschedules, not as regular reviews, they are not intended for abuse. Use the modifier buttons if you need these logged as regular reviews.  
 
 Values include: positive or negative intervals, positive or negative dates, and zero. No p prefix.  
 
@@ -12,7 +12,7 @@ You can remove or create as many custom buttons as you need.
 
 
 ### Modifier Buttons:
-In write enabled mode, modifier buttons are created. These buttons are used similar to the interval modifier and are logged as regular reviews. If the adjusted interval is above the good button, it will be counted as an ease bonus and graded as "easy" 4. If below good, it'll be graded as "good" 3. And below a certain threshold, it's graded as "hard" 2. Below this threshold, it's counted as "again" 1 or lapsed.
+In write enabled mode, modifier buttons are created. These buttons are used similar to the interval modifier and are logged as regular reviews. If the adjusted interval is above the good button, it will be counted as an ease bonus and graded as "easy" 4. If below good, it'll be graded as "good" 3. And within a certain threshold of the current interval, it's graded as "hard" 2. But below this threshold, it's counted as "again" 1 or lapsed, similar to grading the card with a new lapsed interval of 50% or so.  
 
 You can remove or create as many custom modifier buttons as you need.  
 
