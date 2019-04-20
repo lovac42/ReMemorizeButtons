@@ -77,9 +77,13 @@ def wrap_constrainedIvl(sched, ivl, conf, prev, fuzz=False, _old=None):
     return _old(sched, ivl, conf, prev, fuzz)
 
 
-def wrap_rescheduleRev(sched, card, ease, _old):
+
+def wrap_rescheduleRev(sched, card, ease, early=False, _old=None):
     "If user config set to keep original factor, ensures proper logging"
-    ret=_old(sched, card, ease) #using _old ensures load order
+    if mw.col.sched.name=="std":
+        ret=_old(sched, card, ease) #using _old ensures load order
+    else:
+        ret=_old(sched, card, ease, early)
     if rBtn.alt_sched.isReschedulable(card):
         card.factor=rBtn.alt_sched.meta_card.getFactor(card.factor)
     return ret
@@ -90,17 +94,21 @@ def wrap_rescheduleNew(sched, card, conf, early, _old):
     mod=rBtn.alt_sched.getModifier()
     if mod: #Reschedulable by default
         card.ivl=max(1,int(card.ivl*mod))
-        card.due = sched.today+card.ivl
+        card.due=sched.today+card.ivl
     return ret
 
 
 def wrap_rescheduleAsRev(sched, card, conf, early, _old):
-    "when lapsed rev cards graduates"
+    "when cards graduates, we are limiting to lapsed cards only"
     nx=rBtn.alt_sched.hasSavedIvl()
     if nx and rBtn.alt_sched.isReschedulable(card):
-        if card.type==2: #rev only
+        if card.type in (2,3): #rev only
             card.ivl=nx
-            card.odue=sched.today+nx #odue will be set to due
+            if mw.col.sched.name=="std":
+                card.odue=sched.today+nx #odue will be set to due on _old
+            else:
+                card.due=sched.today+nx
+    #Fuzz is applied after _old
     _old(sched, card, conf, early)
 
 
@@ -141,15 +149,6 @@ def wrap_shortcutKeys(rev, _old):
 
 
 
-
-
-
-
-
-
-
-Reviewer._answerButtonList = wrap(Reviewer._answerButtonList, wrap_answerButtonList, 'around')
-Reviewer._buttonTime = wrap(Reviewer._buttonTime, wrap_buttonTime, 'around')
 Scheduler.answerCard = wrap(Scheduler.answerCard, wrap_answerCard, 'around')
 Scheduler.answerButtons = wrap(Scheduler.answerButtons, wrap_answerButtons, 'around')
 Scheduler._constrainedIvl = wrap(Scheduler._constrainedIvl, wrap_constrainedIvl, 'around')
@@ -158,14 +157,19 @@ Scheduler._rescheduleRev = wrap(Scheduler._rescheduleRev, wrap_rescheduleRev, 'a
 Scheduler._nextLapseIvl = wrap(Scheduler._nextLapseIvl, wrap_nextLapseIvl, 'around')
 Scheduler._rescheduleAsRev = wrap(Scheduler._rescheduleAsRev, wrap_rescheduleAsRev, 'around')
 
-
 if ANKI21:
     from anki.schedv2 import Scheduler as SchedulerV2
     SchedulerV2.answerCard = wrap(SchedulerV2.answerCard, wrap_answerCard, 'around')
     SchedulerV2.answerButtons = wrap(SchedulerV2.answerButtons, wrap_answerButtons, 'around')
     SchedulerV2._constrainedIvl = wrap(SchedulerV2._constrainedIvl, wrap_constrainedIvl, 'around')
+    SchedulerV2._rescheduleNew = wrap(SchedulerV2._rescheduleNew, wrap_rescheduleNew, 'around')
+    SchedulerV2._rescheduleRev = wrap(SchedulerV2._rescheduleRev, wrap_rescheduleRev, 'around')
     SchedulerV2._lapseIvl = wrap(SchedulerV2._lapseIvl, wrap_nextLapseIvl, 'around')
+    SchedulerV2._rescheduleAsRev = wrap(SchedulerV2._rescheduleAsRev, wrap_rescheduleAsRev, 'around')
+
     Reviewer._shortcutKeys = wrap(Reviewer._shortcutKeys, wrap_shortcutKeys, 'around')
 else:
     Reviewer._keyHandler = wrap(Reviewer._keyHandler, wrap_keyHandler, 'around')
+Reviewer._answerButtonList = wrap(Reviewer._answerButtonList, wrap_answerButtonList, 'around')
+Reviewer._buttonTime = wrap(Reviewer._buttonTime, wrap_buttonTime, 'around')
 

@@ -30,7 +30,7 @@ class AltScheduler:
 
     def remapBtnGrade(self, card, nxIvl):
         for e in (4,3,2):
-            if nxIvl>=self.nextRevIvl(card,e):
+            if nxIvl>self.nextRevIvl(card,e):
                 return min(4,e+1)
 
         th=self.conf.get('hard_grade_threshold',60)/100.0

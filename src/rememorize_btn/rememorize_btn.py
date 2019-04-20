@@ -138,7 +138,7 @@ class ReMemButtons:
             self.real_ease=ease #save for tooltip usage
             modifier=int(self.btns[ease-5][1])/100.0 #zero based
             if card.queue in (0,1,3):
-                ease=self.count
+                ease=self.count #find ez btn
             return self.alt_sched.reschedule(card,ease,modifier)
 
         if self.rememorize:
