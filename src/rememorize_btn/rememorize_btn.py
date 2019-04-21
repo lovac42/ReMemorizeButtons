@@ -22,7 +22,7 @@ class ReMemButtons:
     mode=True
     write_btns=0 #offset marker
     real_ease=0 #for tooltip
-    count=4 #total real btn cnt
+    count=4 #total actual anki btn cnt
 
 
     def __init__(self):
@@ -81,18 +81,13 @@ class ReMemButtons:
     def _getModifierTime(self, ease):
         card=mw.reviewer.card
         modifier=int(self.btns[ease-5][1])/100.0 #zero based
-
+        self.alt_sched.setModifier(modifier)
         if card.queue in(0,1,3):
-            ivl=mw.col.sched._nextLrnIvl(card,self.count) #time string
-            ivl=max(1,int(ivl*modifier)//86400) #extra work for precision
-            s=fmtTimeSpan(ivl*86400,short=True)
-
+            ivl=self.alt_sched.getLrnBtnIvl(card,self.count)
         else:
-            self.alt_sched.setModifier(modifier)
             ivl=self.alt_sched.getBtnIvl(card,self.count)
-            s=fmtTimeSpan(ivl*86400,short=True)
-
-        return '<span class="nobold rem_modifier rem_time%d">%s</span><br>'%(ease-4,s)
+        s=fmtTimeSpan(ivl*86400,short=True)
+        return '<span class="nobold rem_modifier rem_time%d">%s</span><br>'%(ease-MAX_DEF_BTN,s)
 
 
     def getKeys(self):
@@ -122,7 +117,9 @@ class ReMemButtons:
             return False
 
         if card:
-            if card.ivl > self.conf.get('young_card_ivl',0):
+            if card.queue>3: #q4=preview
+                self.mode=False
+            elif card.ivl > self.conf.get('young_card_ivl',0):
                 self.mode=False
             elif card.odid and self.conf.get('disallow_filtered_decks',True):
                 self.mode=False

@@ -76,55 +76,46 @@ def wrap_constrainedIvl(sched, ivl, conf, prev, fuzz=False, _old=None):
 
 
 def wrap_rescheduleLapse(sched, card, _old):
-    "Ensures proper EF logging for fail btn"
+    "Ensures proper EF logging for fail btn -200"
     delay=_old(sched,card)
-    if rBtn.alt_sched.isReschedulable(card):
-        card.factor=rBtn.alt_sched.meta_card.getFactor(card.factor)
+    fct=rBtn.alt_sched.hasSavedFactor()
+    if fct and rBtn.alt_sched.isReschedulable(card):
+        card.factor=fct
     return delay
 
 
 def wrap_rescheduleRev(sched, card, ease, early=False, _old=None):
-    "Ensures proper EF logging for pass btns"
+    "Ensures proper EF logging for pass btns -+150"
     if sched.name=="std":
         ret=_old(sched, card, ease) #using _old ensures load order
     else:
         ret=_old(sched, card, ease, early)
-    if rBtn.alt_sched.isReschedulable(card):
-        card.factor=rBtn.alt_sched.meta_card.getFactor(card.factor)
+
+    fct=rBtn.alt_sched.hasSavedFactor()
+    if fct and rBtn.alt_sched.isReschedulable(card):
+        card.factor=fct
     return ret
 
-
-def wrap_rescheduleNew(sched, card, conf, early, _old):
-    "initialize new cards, then add modifier"
-    ret=_old(sched, card, conf, early)
-    mod=rBtn.alt_sched.getModifier()
-    if mod: #Reschedulable by default
-        card.ivl=max(1,int(card.ivl*mod))
-        card.due=sched.today+card.ivl
-    return ret
 
 
 def wrap_rescheduleAsRev(sched, card, conf, early, _old):
-    "when cards graduates, we are limiting to lapsed cards only"
+    "when cards graduates"
+    ret=_old(sched, card, conf, early)
     nx=rBtn.alt_sched.hasSavedIvl()
     if nx and rBtn.alt_sched.isReschedulable(card):
-        if card.type in (2,3): #rev only
-            card.ivl=nx
-            if sched.name=="std":
-                card.odue=sched.today+nx #odue will be set to due on _old
-            else:
-                card.due=sched.today+nx
-    #Fuzz is applied after _old
-    _old(sched, card, conf, early)
+        card.ivl=nx
+        card.due=sched.today+nx
+    return ret
 
 
-#Renamed _lapseIvl on v2
+
+#Renamed to _lapseIvl on v2
 def wrap_nextLapseIvl(sched, card, conf, _old):
     "Sets the new lapsed ivl when a card lapses due to extremely small modifier button"
     ret=_old(sched, card, conf) #trigger other addons
     nx=rBtn.alt_sched.hasSavedIvl()
-    if nx: #Reschedulable by default
-        ret=max(conf['minInt'],nx)
+    if nx and rBtn.alt_sched.isReschedulable(card):
+        ret=max(1,nx)
     return ret
 
 
@@ -158,7 +149,6 @@ def wrap_shortcutKeys(rev, _old):
 Scheduler.answerCard = wrap(Scheduler.answerCard, wrap_answerCard, 'around')
 Scheduler.answerButtons = wrap(Scheduler.answerButtons, wrap_answerButtons, 'around')
 Scheduler._constrainedIvl = wrap(Scheduler._constrainedIvl, wrap_constrainedIvl, 'around')
-Scheduler._rescheduleNew = wrap(Scheduler._rescheduleNew, wrap_rescheduleNew, 'around')
 Scheduler._rescheduleRev = wrap(Scheduler._rescheduleRev, wrap_rescheduleRev, 'around')
 Scheduler._nextLapseIvl = wrap(Scheduler._nextLapseIvl, wrap_nextLapseIvl, 'around')
 Scheduler._rescheduleAsRev = wrap(Scheduler._rescheduleAsRev, wrap_rescheduleAsRev, 'around')
@@ -169,7 +159,6 @@ if ANKI21:
     SchedulerV2.answerCard = wrap(SchedulerV2.answerCard, wrap_answerCard, 'around')
     SchedulerV2.answerButtons = wrap(SchedulerV2.answerButtons, wrap_answerButtons, 'around')
     SchedulerV2._constrainedIvl = wrap(SchedulerV2._constrainedIvl, wrap_constrainedIvl, 'around')
-    SchedulerV2._rescheduleNew = wrap(SchedulerV2._rescheduleNew, wrap_rescheduleNew, 'around')
     SchedulerV2._rescheduleRev = wrap(SchedulerV2._rescheduleRev, wrap_rescheduleRev, 'around')
     SchedulerV2._lapseIvl = wrap(SchedulerV2._lapseIvl, wrap_nextLapseIvl, 'around')
     SchedulerV2._rescheduleAsRev = wrap(SchedulerV2._rescheduleAsRev, wrap_rescheduleAsRev, 'around')

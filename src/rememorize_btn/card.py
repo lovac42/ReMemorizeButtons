@@ -22,8 +22,8 @@ class MetaCard:
     def setFactor(self, fct):
         self.factor=fct
 
-    def getFactor(self, fct):
-        return self.factor or fct
+    def getFactor(self):
+        return self.factor
 
 
 

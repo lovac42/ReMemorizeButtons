@@ -30,7 +30,9 @@ class AltScheduler:
 
     def remapBtnGrade(self, card, nxIvl):
         for e in (4,3,2):
-            if nxIvl>self.nextRevIvl(card,e):
+            #sm2 min ef is 1.3, adding 1.1x as an upper threshold.
+            gradeIvl=int(self.nextRevIvl(card,e)*1.1)
+            if nxIvl>gradeIvl:
                 return min(4,e+1)
 
         th=self.conf.get('hard_grade_threshold',60)/100.0
@@ -45,19 +47,30 @@ class AltScheduler:
         return max(1,int(nxIvl*self.modifier))
 
 
+    def getLrnBtnIvl(self, card, ease):
+        nxIvl=mw.col.sched._nextLrnIvl(card,ease) #time string
+        return max(1,int(nxIvl*self.modifier)//86400) #extra work for precision
+
+
     # Unreliable results due to _constrainedIvl() by hard ivl.
-    # Interval modifier is factored in afterwards. When set to random
-    # ivl modifier, the 130% on easy button is different from the 130%
-    # used by this addon's modifier buttons.
+    # Interval modifier is factored in afterwards. When set with an
+    # ivl modifier less than 100%, the 130% on the easy button is
+    # different from the 130% used by this addon's modifier buttons.
     def nextRevIvl(self, card, ease, fuzz=False):
         if mw.col.sched.name=="std": #V1
-            return mw.col.sched._nextRevIvl(card,ease)
-        else: #V2
-            return mw.col.sched._nextRevIvl(card,ease,fuzz)
+            return mw.col.sched._nextRevIvl(card,ease) #no fuzz on V1
+        return mw.col.sched._nextRevIvl(card,ease,fuzz) #V2
 
+
+    def hasSavedFactor(self):
+        if not self.conf.get('keep_ease_factor',False):
+            return False
+        return self.meta_card.getFactor()
 
     def hasSavedIvl(self):
-        return self.meta_card.ivl
+        if not self.conf.get('enable_write_access',False):
+            return False
+        return self.meta_card.getIvl()
 
 
     def isReschedulable(self, card):
@@ -75,25 +88,23 @@ class AltScheduler:
 
 
     def reschedule(self, card, ease, modifier):
-        assert self.conf.get('enable_write_access',False)
+        assert self.isReschedulable(card)
         self.setModifier(modifier)
-        self.answerCard(card,ease)
+        self._answerCard(card,ease)
         self.reset()
 
 
-    def answerCard(self, card, ease):
-        assert self.isReschedulable(card)
-        nxIvl=card.ivl or 1
+    def _answerCard(self, card, ease):
+        #Causes Undo problems if manipulating card.ivl directly
 
-        if card.queue in (1,3):
-            #adds bonus to lrn card's ivl
-            nxIvl=max(1,int(nxIvl*self.modifier))
-            #Causes Undo problems if manipulating card.ivl directly
-
+        if card.queue in (0,1,3):
+            nxIvl=self.getLrnBtnIvl(card,ease)
         elif card.queue==2:
+            self.meta_card.setFactor(card.factor)
             nxIvl=self.getBtnIvl(card,ease)
             ease=self.remapBtnGrade(card,nxIvl)
+        else: #queue 4 (preview)
+            nxIvl=0 #skip
 
         self.meta_card.setIvl(nxIvl)
-        self.meta_card.setFactor(card.factor)
         mw.col.sched.answerCard(card,ease)

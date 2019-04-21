@@ -15,7 +15,10 @@ ADDON_NAME='rememorize_btn'
 DEFAULT_BTN=(('ReM',25),)
 
 
+MAX_DEF_BTN=4
+
 REMEMORIZE_BTN=0
+
 MODIFIER_BTN=1
 
 
