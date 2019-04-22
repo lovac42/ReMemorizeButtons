@@ -28,6 +28,11 @@ Modifier buttons are graded according to their next interval. If the adjusted in
 e.g. The current interval is 10d, threshold would be 6d, if the modifier button is calculated to be 5d, it'll be graded as "again" and the card will lapse. This is similar to setting new lapsed interval modifier as 50%. However if the calculated interval is 6d or 7d, then it'll be within the threshold and graded as "hard".  
 
 
+## allow_lapse_grade:
+true or false  
+If the grade falls below 60% of current interval, grade as "again".  
+
+
 ## keep_ease_factor:
 true or false  
 Modifier buttons are graded according to their next interval. Anki will adjust the ease factor based on this grade. Setting this to true will keep the original factor regardless of the grade.  

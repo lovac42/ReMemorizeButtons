@@ -38,7 +38,11 @@ class AltScheduler:
         th=self.conf.get('hard_grade_threshold',60)/100.0
         if nxIvl>=int(card.ivl*th):
             return 2
-        return 1
+
+        if self.conf.get('allow_lapse_grade',True):
+            return 1
+        return 2
+
 
 
     def getBtnIvl(self, card, maxEase):
