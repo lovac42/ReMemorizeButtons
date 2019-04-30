@@ -59,18 +59,18 @@ def wrap_answerCard(sched, card, ease, _old):
         ret=_old(sched, card, ease)
         rBtn.showAnsConfirm(ease)
         return ret
-    try:
-        rBtn.reschedule(card,ease)
-    except TypeError: pass
-
+    # try:
+    rBtn.reschedule(card,ease)
+    # except TypeError: pass
+    # ^ enable if needed
 
 
 def wrap_constrainedIvl(sched, ivl, conf, prev, fuzz=False, _old=None):
     nx=rBtn.alt_sched.hasSavedIvl()
-    if nx:
-        return nx
     if sched.name=="std":
+        if nx: return nx #V1 fuzz afterwards
         return _old(sched, ivl, conf, prev)
+    if nx: return sched._fuzzedIvl(nx)
     return _old(sched, ivl, conf, prev, fuzz)
 
 
